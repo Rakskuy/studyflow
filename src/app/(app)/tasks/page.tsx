@@ -282,16 +282,16 @@ export default function TasksPage() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-5 sm:space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Tugas</h1>
-          <p className="text-slate-400 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Tugas Kuliah</h1>
+          <p className="text-slate-400 text-sm mt-0.5 sm:mt-1">
             {tasks.length} tugas ditemukan
           </p>
         </div>
-        <button onClick={openCreateModal} className="btn-primary">
+        <button onClick={openCreateModal} className="btn-primary w-full sm:w-auto justify-center shadow-lg shadow-brand-500/20">
           <svg
             className="w-5 h-5"
             fill="none"
@@ -306,8 +306,8 @@ export default function TasksPage() {
       </div>
 
       {/* Filters */}
-      <div className="glass-card p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className="glass-card p-3 sm:p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 sm:gap-3">
           {/* Search */}
           <div className="lg:col-span-2">
             <div className="relative">

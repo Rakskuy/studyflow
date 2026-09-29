@@ -135,16 +135,16 @@ export default function CoursesPage() {
   }
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-6 sm:space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Mata Kuliah</h1>
-          <p className="text-slate-400 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Mata Kuliah</h1>
+          <p className="text-slate-400 text-sm mt-0.5 sm:mt-1">
             Kelola daftar mata kuliah semester ini
           </p>
         </div>
-        <button onClick={openCreateModal} className="btn-primary">
+        <button onClick={openCreateModal} className="btn-primary w-full sm:w-auto justify-center shadow-lg shadow-brand-500/20">
           <svg
             className="w-5 h-5"
             fill="none"
@@ -160,10 +160,10 @@ export default function CoursesPage() {
 
       {/* Course Grid */}
       {courses.length === 0 ? (
-        <div className="glass-card p-12 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-brand-500/10 flex items-center justify-center mx-auto mb-4">
+        <div className="glass-card p-8 sm:p-12 text-center">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-brand-500/10 flex items-center justify-center mx-auto mb-4">
             <svg
-              className="w-8 h-8 text-brand-400"
+              className="w-7 h-7 sm:w-8 sm:h-8 text-brand-400"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
@@ -172,22 +172,22 @@ export default function CoursesPage() {
               <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">
+          <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
             Belum ada mata kuliah
           </h3>
-          <p className="text-slate-400 mb-6">
+          <p className="text-slate-400 text-sm mb-6 max-w-sm mx-auto">
             Tambahkan mata kuliah pertamamu untuk mulai mengatur tugas
           </p>
-          <button onClick={openCreateModal} className="btn-primary">
+          <button onClick={openCreateModal} className="btn-primary w-full sm:w-auto justify-center">
             Tambah Mata Kuliah Pertama
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
           {courses.map((course) => (
             <div
               key={course.id}
-              className="glass-card glass-card-hover p-6 stagger-item"
+              className="glass-card glass-card-hover p-4 sm:p-6 stagger-item"
             >
               {/* Color accent bar */}
               <div

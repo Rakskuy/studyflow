@@ -75,9 +75,9 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`${
+      className={`hidden md:flex ${
         collapsed ? "w-20" : "w-64"
-      } min-h-screen bg-surface-800 border-r border-white/5 flex flex-col transition-all duration-300 ease-in-out`}
+      } min-h-screen h-screen sticky top-0 bg-surface-800 border-r border-white/5 flex-col transition-all duration-300 ease-in-out z-20`}
     >
       {/* Logo */}
       <div className="p-6 flex items-center justify-between">

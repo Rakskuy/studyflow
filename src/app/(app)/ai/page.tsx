@@ -133,11 +133,11 @@ export default function AIAssistantPage() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] animate-fade-in">
+    <div className="flex flex-col h-[calc(100dvh-10.5rem)] md:h-[calc(100vh-4rem)] animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-purple-500 flex items-center justify-center">
+      <div className="flex items-center justify-between mb-3 sm:mb-4 flex-shrink-0">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-brand-500 to-purple-500 flex items-center justify-center flex-shrink-0 shadow-md">
             <svg
               className="w-5 h-5 text-white"
               fill="none"
@@ -148,17 +148,17 @@ export default function AIAssistantPage() {
               <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
             </svg>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white">AI Assistant</h1>
-            <p className="text-slate-400 text-sm">
-              Powered by Dahl & Gemini — Multi-Model Auto-Fallback
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-white truncate">AI Assistant</h1>
+            <p className="text-slate-400 text-xs sm:text-sm truncate">
+              Multi-Model AI Study Assistant
             </p>
           </div>
         </div>
         {messages.length > 0 && (
-          <button onClick={clearChat} className="btn-ghost text-sm">
+          <button onClick={clearChat} className="btn-ghost text-xs sm:text-sm px-2.5 sm:px-3 py-1.5 flex items-center gap-1.5 flex-shrink-0">
             <svg
-              className="w-4 h-4"
+              className="w-3.5 h-3.5 sm:w-4 sm:h-4"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
@@ -166,7 +166,7 @@ export default function AIAssistantPage() {
             >
               <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
-            Hapus Chat
+            <span className="hidden xs:inline">Hapus</span>
           </button>
         )}
       </div>

@@ -141,14 +141,14 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-          <p className="text-slate-400 mt-1">
-            Ringkasan tugas dan aktivitas kamu
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Dashboard</h1>
+          <p className="text-slate-400 text-sm mt-1">
+            Ringkasan tugas dan aktivitas kuliahmu
           </p>
         </div>
-        <Link href="/tasks" className="btn-primary">
+        <Link href="/tasks" className="btn-primary w-full sm:w-auto justify-center shadow-lg shadow-brand-500/20">
           <svg
             className="w-5 h-5"
             fill="none"
@@ -162,14 +162,14 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Stats Cards - 2 cols on mobile, 4 cols on desktop */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Tasks */}
-        <div className="glass-card p-6 stagger-item">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-10 h-10 rounded-xl bg-brand-500/15 flex items-center justify-center">
+        <div className="glass-card p-4 sm:p-6 stagger-item">
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-brand-500/15 flex items-center justify-center">
               <svg
-                className="w-5 h-5 text-brand-400"
+                className="w-4 h-4 sm:w-5 sm:h-5 text-brand-400"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -178,20 +178,20 @@ export default function DashboardPage() {
                 <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
-            <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">
+            <span className="text-[10px] sm:text-xs text-slate-500 font-medium uppercase tracking-wider">
               Total
             </span>
           </div>
-          <p className="text-3xl font-bold text-white">{stats.total}</p>
-          <p className="text-sm text-slate-400 mt-1">Semua tugas</p>
+          <p className="text-2xl sm:text-3xl font-bold text-white">{stats.total}</p>
+          <p className="text-xs sm:text-sm text-slate-400 mt-0.5 sm:mt-1">Semua tugas</p>
         </div>
 
         {/* Todo */}
-        <div className="glass-card p-6 stagger-item">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-10 h-10 rounded-xl bg-accent-amber/15 flex items-center justify-center">
+        <div className="glass-card p-4 sm:p-6 stagger-item">
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-accent-amber/15 flex items-center justify-center">
               <svg
-                className="w-5 h-5 text-accent-amber"
+                className="w-4 h-4 sm:w-5 sm:h-5 text-accent-amber"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -200,20 +200,20 @@ export default function DashboardPage() {
                 <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">
+            <span className="text-[10px] sm:text-xs text-slate-500 font-medium uppercase tracking-wider">
               Belum
             </span>
           </div>
-          <p className="text-3xl font-bold text-white">{stats.todo}</p>
-          <p className="text-sm text-slate-400 mt-1">Belum dikerjakan</p>
+          <p className="text-2xl sm:text-3xl font-bold text-white">{stats.todo}</p>
+          <p className="text-xs sm:text-sm text-slate-400 mt-0.5 sm:mt-1">Belum selesai</p>
         </div>
 
         {/* In Progress */}
-        <div className="glass-card p-6 stagger-item">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-10 h-10 rounded-xl bg-accent-sky/15 flex items-center justify-center">
+        <div className="glass-card p-4 sm:p-6 stagger-item">
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-accent-sky/15 flex items-center justify-center">
               <svg
-                className="w-5 h-5 text-accent-sky"
+                className="w-4 h-4 sm:w-5 sm:h-5 text-accent-sky"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -222,20 +222,20 @@ export default function DashboardPage() {
                 <path d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">
+            <span className="text-[10px] sm:text-xs text-slate-500 font-medium uppercase tracking-wider">
               Proses
             </span>
           </div>
-          <p className="text-3xl font-bold text-white">{stats.inProgress}</p>
-          <p className="text-sm text-slate-400 mt-1">Sedang dikerjakan</p>
+          <p className="text-2xl sm:text-3xl font-bold text-white">{stats.inProgress}</p>
+          <p className="text-xs sm:text-sm text-slate-400 mt-0.5 sm:mt-1">Dikerjakan</p>
         </div>
 
         {/* Done */}
-        <div className="glass-card p-6 stagger-item">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-10 h-10 rounded-xl bg-accent-emerald/15 flex items-center justify-center">
+        <div className="glass-card p-4 sm:p-6 stagger-item">
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-accent-emerald/15 flex items-center justify-center">
               <svg
-                className="w-5 h-5 text-accent-emerald"
+                className="w-4 h-4 sm:w-5 sm:h-5 text-accent-emerald"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -244,12 +244,12 @@ export default function DashboardPage() {
                 <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">
+            <span className="text-[10px] sm:text-xs text-slate-500 font-medium uppercase tracking-wider">
               Selesai
             </span>
           </div>
-          <p className="text-3xl font-bold text-white">{stats.done}</p>
-          <p className="text-sm text-slate-400 mt-1">Tugas selesai</p>
+          <p className="text-2xl sm:text-3xl font-bold text-white">{stats.done}</p>
+          <p className="text-xs sm:text-sm text-slate-400 mt-0.5 sm:mt-1">Telah selesai</p>
         </div>
       </div>
 
