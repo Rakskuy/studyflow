@@ -1,0 +1,59 @@
+// StudyFlow - Prisma Schema
+// SQLite database for local-first operation
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  courses Course[]
+  tasks   Task[]
+}
+
+model Course {
+  id        String   @id @default(cuid())
+  name      String
+  lecturer  String
+  color     String   @default("#6366f1")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks  Task[]
+
+  @@index([userId])
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @default("")
+  deadline    DateTime
+  priority    String   @default("medium") // low, medium, high
+  status      String   @default("todo")   // todo, in_progress, done
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([deadline])
+  @@index([status])
+}
