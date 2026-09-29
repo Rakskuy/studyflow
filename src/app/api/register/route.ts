@@ -53,10 +53,14 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      { error: "Terjadi kesalahan server" },
+      { 
+        error: "Terjadi kesalahan server",
+        details: error?.message || String(error),
+        code: error?.code 
+      },
       { status: 500 }
     );
   }
