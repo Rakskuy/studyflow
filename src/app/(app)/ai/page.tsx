@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 interface Message {
   id: string;
@@ -50,12 +51,58 @@ function formatMarkdown(text: string) {
 }
 
 export default function AIAssistantPage() {
+  const { data: session } = useSession();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [clearToast, setClearToast] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Storage key spesifik per user agar tidak bercampur
+  const storageKey = session?.user?.email
+    ? `studyflow_ai_history_${session.user.email}`
+    : "studyflow_ai_history_default";
+
+  // 1. Muat riwayat chat dari localStorage saat halaman dibuka
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setMessages(
+            parsed.map((m: any) => ({
+              ...m,
+              timestamp: new Date(m.timestamp),
+            }))
+          );
+        }
+      }
+    } catch (e) {
+      console.error("Gagal memuat riwayat chat:", e);
+    } finally {
+      setIsLoaded(true);
+    }
+  }, [storageKey]);
+
+  // 2. Simpan setiap perubahan pesan ke localStorage secara otomatis
+  useEffect(() => {
+    if (!isLoaded) return;
+    try {
+      if (messages.length === 0) {
+        localStorage.removeItem(storageKey);
+      } else {
+        localStorage.setItem(storageKey, JSON.stringify(messages));
+      }
+    } catch (e) {
+      console.error("Gagal menyimpan riwayat chat:", e);
+    }
+  }, [messages, isLoaded, storageKey]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -127,9 +174,17 @@ export default function AIAssistantPage() {
     }
   };
 
-  const clearChat = () => {
+  const confirmClearChat = () => {
     setMessages([]);
     setError("");
+    setShowClearConfirm(false);
+    try {
+      localStorage.removeItem(storageKey);
+      setClearToast(true);
+      setTimeout(() => setClearToast(false), 3000);
+    } catch (e) {
+      console.error("Gagal menghapus riwayat chat:", e);
+    }
   };
 
   return (
@@ -156,7 +211,11 @@ export default function AIAssistantPage() {
           </div>
         </div>
         {messages.length > 0 && (
-          <button onClick={clearChat} className="btn-ghost text-xs sm:text-sm px-2.5 sm:px-3 py-1.5 flex items-center gap-1.5 flex-shrink-0">
+          <button
+            onClick={() => setShowClearConfirm(true)}
+            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs sm:text-sm flex items-center gap-1.5 flex-shrink-0 transition-all active:scale-95"
+            title="Hapus riwayat chat"
+          >
             <svg
               className="w-3.5 h-3.5 sm:w-4 sm:h-4"
               fill="none"
@@ -166,7 +225,7 @@ export default function AIAssistantPage() {
             >
               <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
-            <span className="hidden xs:inline">Hapus</span>
+            <span>Hapus Riwayat</span>
           </button>
         )}
       </div>
@@ -370,6 +429,55 @@ export default function AIAssistantPage() {
           Tekan Enter untuk kirim, Shift+Enter untuk baris baru
         </p>
       </div>
+
+      {/* Confirmation Modal to Clear History */}
+      {showClearConfirm && (
+        <div
+          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setShowClearConfirm(false)}
+        >
+          <div
+            className="glass-card max-w-sm w-full p-6 text-center animate-slide-up border border-white/20 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-12 rounded-2xl bg-red-500/15 text-red-400 flex items-center justify-center mx-auto mb-4 border border-red-500/20">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Hapus Riwayat Chat?</h3>
+            <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+              Semua percakapan kamu dengan AI akan dihapus dari perangkat ini dan tidak dapat dikembalikan.
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowClearConfirm(false)}
+                className="btn-secondary flex-1 justify-center py-2.5 text-sm"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={confirmClearChat}
+                className="flex-1 justify-center py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium text-sm transition-all shadow-lg shadow-red-500/25 flex items-center gap-1.5"
+              >
+                Ya, Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification when History Cleared */}
+      {clearToast && (
+        <div className="fixed bottom-20 md:bottom-8 right-4 left-4 sm:left-auto sm:right-8 z-50 p-4 rounded-xl bg-surface-800/95 border border-emerald-500/30 text-emerald-300 text-sm shadow-2xl flex items-center gap-3 backdrop-blur-xl animate-slide-up">
+          <svg className="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>Riwayat chat berhasil dibersihkan ✨</span>
+        </div>
+      )}
     </div>
   );
 }
