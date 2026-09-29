@@ -14,6 +14,23 @@ export async function POST(req: Request) {
       );
     }
 
+    const trimmedName = String(name).trim();
+    const normalizedEmail = String(email).trim().toLowerCase();
+
+    if (!trimmedName) {
+      return NextResponse.json(
+        { error: "Nama lengkap tidak boleh kosong" },
+        { status: 400 }
+      );
+    }
+
+    if (!normalizedEmail.includes("@") || !normalizedEmail.includes(".")) {
+      return NextResponse.json(
+        { error: "Format email tidak valid" },
+        { status: 400 }
+      );
+    }
+
     if (password.length < 6) {
       return NextResponse.json(
         { error: "Password minimal 6 karakter" },
@@ -21,14 +38,25 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check existing user
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
+    // Check existing user case-insensitively
+    let existingUser = await prisma.user.findFirst({
+      where: {
+        email: {
+          equals: normalizedEmail,
+          mode: "insensitive",
+        },
+      },
     });
+
+    if (!existingUser) {
+      existingUser = await prisma.user.findUnique({
+        where: { email: normalizedEmail },
+      });
+    }
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "Email sudah terdaftar" },
+        { error: "Email sudah terdaftar. Silakan langsung masuk." },
         { status: 409 }
       );
     }
@@ -37,14 +65,15 @@ export async function POST(req: Request) {
     const hashedPassword = await hash(password, 12);
     const user = await prisma.user.create({
       data: {
-        name,
-        email,
+        name: trimmedName,
+        email: normalizedEmail,
         password: hashedPassword,
       },
     });
 
     return NextResponse.json(
       {
+        message: "Pendaftaran berhasil",
         user: {
           id: user.id,
           name: user.name,

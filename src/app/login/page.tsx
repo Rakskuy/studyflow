@@ -1,16 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
+function LoginForm() {
+  const searchParams = useSearchParams();
+  const registered = searchParams.get("registered");
+  const initialEmail = searchParams.get("email") || "";
+
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showRegisteredSuccess, setShowRegisteredSuccess] = useState(registered === "true");
+
+  useEffect(() => {
+    if (initialEmail) {
+      setEmail(initialEmail);
+    }
+    if (registered === "true") {
+      setShowRegisteredSuccess(true);
+    }
+  }, [initialEmail, registered]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,21 +31,23 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      const cleanEmail = email.trim().toLowerCase();
+
       const result = await signIn("credentials", {
-        email,
+        email: cleanEmail,
         password,
         redirect: false,
       });
 
       if (result?.error) {
         setError("Email atau password salah");
+        setLoading(false);
       } else {
-        router.push("/dashboard");
-        router.refresh();
+        // Gunakan full navigation agar session cookie langsung aktif
+        window.location.href = "/dashboard";
       }
     } catch {
-      setError("Terjadi kesalahan. Coba lagi.");
-    } finally {
+      setError("Terjadi kesalahan. Silakan coba lagi.");
       setLoading(false);
     }
   };
@@ -59,6 +74,15 @@ export default function LoginPage() {
         {/* Form */}
         <div className="glass-card p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
+            {showRegisteredSuccess && (
+              <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm animate-fade-in flex items-center gap-3">
+                <svg className="w-5 h-5 flex-shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Akun berhasil didaftarkan! Silakan masuk dengan email dan password.</span>
+              </div>
+            )}
+
             {error && (
               <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm animate-fade-in">
                 {error}
@@ -107,7 +131,7 @@ export default function LoginPage() {
               className="btn-primary w-full py-3"
             >
               {loading ? (
-                <span className="flex items-center gap-2">
+                <span className="flex items-center justify-center gap-2">
                   <svg
                     className="animate-spin h-4 w-4"
                     fill="none"
@@ -149,5 +173,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-surface-900 flex items-center justify-center">
+        <div className="animate-spin h-8 w-8 border-4 border-brand-500 border-t-transparent rounded-full" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

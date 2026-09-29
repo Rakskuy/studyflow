@@ -1,21 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 
 export default function RegisterPage() {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setStatusMessage("");
 
     if (password !== confirmPassword) {
       setError("Password tidak cocok");
@@ -28,25 +29,50 @@ export default function RegisterPage() {
     }
 
     setLoading(true);
+    setStatusMessage("Mendaftarkan akun...");
 
     try {
+      const cleanName = name.trim();
+      const cleanEmail = email.trim().toLowerCase();
+
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name: cleanName, email: cleanEmail, password }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Gagal mendaftar");
+        const errorMsg = data.details
+          ? `${data.error} (${data.details})`
+          : (data.error || "Gagal mendaftar");
+        setError(errorMsg);
+        setLoading(false);
+        setStatusMessage("");
+        return;
+      }
+
+      setStatusMessage("Akun berhasil dibuat! Sedang masuk otomatis...");
+
+      // Auto login setelah pendaftaran berhasil
+      const loginResult = await signIn("credentials", {
+        email: cleanEmail,
+        password,
+        redirect: false,
+      });
+
+      if (loginResult?.error) {
+        // Fallback jika auto-login gagal, arahkan ke login dengan query param
+        window.location.href = `/login?registered=true&email=${encodeURIComponent(cleanEmail)}`;
       } else {
-        router.push("/login?registered=true");
+        // Berhasil login otomatis, langsung ke dashboard
+        window.location.href = "/dashboard";
       }
     } catch {
-      setError("Terjadi kesalahan. Coba lagi.");
-    } finally {
+      setError("Terjadi kesalahan koneksi. Silakan coba lagi.");
       setLoading(false);
+      setStatusMessage("");
     }
   };
 
@@ -160,7 +186,7 @@ export default function RegisterPage() {
               className="btn-primary w-full py-3"
             >
               {loading ? (
-                <span className="flex items-center gap-2">
+                <span className="flex items-center justify-center gap-2">
                   <svg
                     className="animate-spin h-4 w-4"
                     fill="none"
@@ -180,7 +206,7 @@ export default function RegisterPage() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                     />
                   </svg>
-                  Mendaftar...
+                  {statusMessage || "Mendaftar..."}
                 </span>
               ) : (
                 "Daftar Sekarang"

@@ -4,6 +4,8 @@ import { compare } from "bcryptjs";
 import prisma from "@/lib/prisma";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "studyflow-dev-secret-change-in-production-2024",
   session: {
     strategy: "jwt",
   },
@@ -22,16 +24,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
+        const normalizedEmail = (credentials.email as string).trim().toLowerCase();
+        const password = credentials.password as string;
+
+        // Try case-insensitive lookup first
+        let user = await prisma.user.findFirst({
+          where: {
+            email: {
+              equals: normalizedEmail,
+              mode: "insensitive",
+            },
+          },
         });
+
+        if (!user) {
+          user = await prisma.user.findUnique({
+            where: { email: normalizedEmail },
+          });
+        }
 
         if (!user) {
           return null;
         }
 
         const isPasswordValid = await compare(
-          credentials.password as string,
+          password,
           user.password
         );
 
@@ -48,6 +65,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
+    authorized({ auth, request: { nextUrl } }) {
+      const isLoggedIn = !!auth?.user;
+      const protectedPaths = ["/dashboard", "/courses", "/tasks", "/ai"];
+      const isProtected = protectedPaths.some((path) =>
+        nextUrl.pathname.startsWith(path)
+      );
+
+      if (isProtected) {
+        if (isLoggedIn) return true;
+        return false; // Redirect unauthenticated users to /login
+      }
+
+      if (isLoggedIn && (nextUrl.pathname === "/login" || nextUrl.pathname === "/register")) {
+        return Response.redirect(new URL("/dashboard", nextUrl));
+      }
+
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
